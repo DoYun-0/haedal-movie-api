@@ -8,7 +8,7 @@ export const MainPage = ({ movies, title, error }) => {
       <ErrorMessage>{error}</ErrorMessage>
       <Grid>
         {movies.map((m) => (
-          <MovieCard key={m.id} />
+          <MovieCard key={m.id} movie={m} />
         ))}
       </Grid>
     </Main>

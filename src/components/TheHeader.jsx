@@ -1,16 +1,25 @@
 import { useState } from "react";
 import styled from "@emotion/styled";
+import { searchMovies } from "../api/tmdbApi";
 
-export const TheHeader = ({ setTitle, setError }) => {
+export const TheHeader = ({ setMovies, setTitle, setError }) => {
   const [query, setQuery] = useState("");
 
-  async function handleSearch() {
+  async function handleSearch(q) {
     setError("");
     setTitle("검색 결과");
-  }
-
-  async function showPopular() {
-    setError("");
+    try {
+      const data = await searchMovies(q);
+      if (!data || data.length === 0) {
+        setMovies([]);
+        setError("검색 결과가 없습니다.");
+        setTitle("");
+        return;
+      }
+      setMovies(data);
+    } catch (e) {
+      setError(e.message);
+    }
   }
 
   return (
@@ -22,11 +31,10 @@ export const TheHeader = ({ setTitle, setError }) => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") handleSearch();
+            if (e.key === "Enter") handleSearch(query);
           }}
         />
-        <SearchButton onClick={() => handleSearch()}>검색</SearchButton>
-        <PopularToggle onClick={showPopular}>인기 영화</PopularToggle>
+        <SearchButton onClick={() => handleSearch(query)}>검색</SearchButton>
       </SearchControls>
     </Header>
   );
@@ -51,11 +59,6 @@ const SearchControls = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-`;
-
-const PopularToggle = styled.div`
-  margin-left: 12px;
-  cursor: pointer;
 `;
 
 const SearchInput = styled.input`
